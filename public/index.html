@@ -280,6 +280,7 @@
     const emptyState = document.getElementById('emptyState');
 
     const history = [];
+    let isLoading = false;
 
     function appendMessage(role, text) {
       if (emptyState) emptyState.remove();
@@ -329,8 +330,9 @@
 
     async function sendMessage() {
       const text = inputEl.value.trim();
-      if (!text) return;
+      if (!text || isLoading) return;
 
+      isLoading = true;
       inputEl.value = '';
       inputEl.style.height = 'auto';
       sendBtn.disabled = true;
@@ -367,6 +369,7 @@
         appendMessage('assistant', '서버에 연결할 수 없습니다.');
       }
 
+      isLoading = false;
       sendBtn.disabled = false;
       inputEl.focus();
     }
