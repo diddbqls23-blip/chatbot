@@ -20,7 +20,7 @@ app.post('/chat', async (req, res) => {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-6',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
         system: '당신은 친절하고 자세하게 답변하는 AI 어시스턴트입니다. 답변을 충분히 길고 상세하게 해주세요.',
         messages,
