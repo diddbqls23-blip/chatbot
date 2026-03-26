@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Claude 챗봇</title>
+  <title>세영이 Claude</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Round+Square:wght@400;700;800&display=swap" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -12,79 +13,178 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f5f5f5;
+      font-family: 'Nanum Round Square', -apple-system, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg,
+        #ffd6e7 0%,
+        #fce4f5 20%,
+        #e8d5f5 40%,
+        #d5e8f5 60%,
+        #c8f0e8 80%,
+        #d4f5d4 100%
+      );
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      padding: 16px;
+    }
+
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* 배경 방울들 */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 400px;
+      height: 400px;
+      background: #ffb3d1;
+      top: -100px;
+      left: -100px;
+    }
+    body::after {
+      width: 350px;
+      height: 350px;
+      background: #b3d4ff;
+      bottom: -80px;
+      right: -80px;
     }
 
     .chat-container {
+      position: relative;
+      z-index: 1;
       width: 100%;
-      max-width: 720px;
-      height: 90vh;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      max-width: 680px;
+      height: 88vh;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 32px;
+      box-shadow:
+        0 8px 40px rgba(200, 150, 220, 0.2),
+        0 2px 12px rgba(0,0,0,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.9);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
     }
 
+    /* ── 헤더 ── */
     .chat-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid #f0f0f0;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .chat-header .avatar {
-      width: 36px;
-      height: 36px;
-      background: #1a1a1a;
-      border-radius: 50%;
+      padding: 20px 24px 16px;
+      background: linear-gradient(135deg, rgba(255,214,231,0.6), rgba(220,200,255,0.6));
+      border-bottom: 1.5px solid rgba(255,255,255,0.7);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      gap: 14px;
+      flex-shrink: 0;
     }
 
-    .chat-header h1 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #1a1a1a;
+    .header-mascot {
+      width: 52px;
+      height: 52px;
+      filter: drop-shadow(0 3px 8px rgba(200,130,180,0.35));
+      animation: mascotBounce 3s ease-in-out infinite;
+      flex-shrink: 0;
     }
 
-    .chat-header .status {
-      font-size: 12px;
-      color: #888;
+    @keyframes mascotBounce {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50%       { transform: translateY(-5px) rotate(2deg); }
+    }
+
+    .header-text {
+      text-align: left;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #e06aaa, #9b6adf, #5aaad0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.3px;
+    }
+
+    .header-sub {
+      font-size: 11px;
+      color: #c08ad0;
       margin-top: 2px;
+      font-weight: 700;
     }
 
+    /* ── 메시지 영역 ── */
     .messages {
       flex: 1;
       overflow-y: auto;
-      padding: 24px;
+      padding: 24px 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
+      scroll-behavior: smooth;
     }
 
     .messages::-webkit-scrollbar {
-      width: 4px;
+      width: 5px;
     }
-
+    .messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
     .messages::-webkit-scrollbar-thumb {
-      background: #e0e0e0;
-      border-radius: 2px;
+      background: rgba(200,160,220,0.35);
+      border-radius: 10px;
     }
 
+    /* ── 빈 화면 ── */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      color: #c8a0d8;
+      padding-bottom: 20px;
+    }
+
+    .empty-state .empty-mascot {
+      width: 90px;
+      height: 90px;
+      opacity: 0.7;
+      animation: mascotBounce 3s ease-in-out infinite;
+    }
+
+    .empty-state p {
+      font-size: 15px;
+      font-weight: 700;
+      color: #c0a0d0;
+    }
+
+    .empty-state .hint {
+      font-size: 12px;
+      color: #d0b8e0;
+    }
+
+    /* ── 말풍선 ── */
     .message {
       display: flex;
       gap: 10px;
-      max-width: 80%;
+      max-width: 82%;
     }
 
     .message.user {
@@ -92,180 +192,283 @@
       flex-direction: row-reverse;
     }
 
-    .message .bubble {
-      padding: 12px 16px;
-      border-radius: 18px;
-      font-size: 14px;
-      line-height: 1.6;
-      word-break: break-word;
+    .message.assistant {
+      align-self: flex-start;
     }
 
-    .message.assistant .bubble {
-      background: #f4f4f4;
-      color: #1a1a1a;
-      border-bottom-left-radius: 4px;
-    }
-
-    .message.user .bubble {
-      background: #1a1a1a;
-      color: #fff;
-      border-bottom-right-radius: 4px;
-    }
-
-    .message .msg-icon {
-      width: 28px;
-      height: 28px;
+    .msg-avatar {
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 13px;
-      flex-shrink: 0;
+      font-size: 16px;
       margin-top: 2px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    .message.assistant .msg-icon {
-      background: #1a1a1a;
+    .message.assistant .msg-avatar {
+      background: linear-gradient(135deg, #ffd6e7, #e8d0f8);
     }
 
-    .message.user .msg-icon {
-      background: #e0e0e0;
+    .message.user .msg-avatar {
+      background: linear-gradient(135deg, #d0eaff, #c8f0e8);
+      font-size: 13px;
+      font-weight: 800;
+      color: #7ab0d0;
     }
 
-    .typing-indicator {
-      display: flex;
-      gap: 4px;
-      padding: 14px 16px;
-      background: #f4f4f4;
-      border-radius: 18px;
-      border-bottom-left-radius: 4px;
-      width: fit-content;
-    }
-
-    .typing-indicator span {
-      width: 6px;
-      height: 6px;
-      background: #aaa;
-      border-radius: 50%;
-      animation: typing 1.2s ease-in-out infinite;
-    }
-
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes typing {
-      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-      30% { transform: translateY(-6px); opacity: 1; }
-    }
-
-    .input-area {
-      padding: 16px 24px;
-      border-top: 1px solid #f0f0f0;
-      display: flex;
-      gap: 12px;
-      align-items: flex-end;
-    }
-
-    .input-area textarea {
-      flex: 1;
-      border: 1.5px solid #e8e8e8;
-      border-radius: 12px;
-      padding: 12px 16px;
+    .bubble {
+      padding: 12px 18px;
       font-size: 14px;
-      font-family: inherit;
-      resize: none;
+      line-height: 1.65;
+      word-break: break-word;
+      position: relative;
+    }
+
+    .message.assistant .bubble {
+      background: rgba(255, 255, 255, 0.88);
+      border-radius: 20px 20px 20px 6px;
+      color: #555;
+      box-shadow: 0 2px 12px rgba(180,140,210,0.15);
+      border: 1px solid rgba(220,200,240,0.4);
+    }
+
+    .message.user .bubble {
+      background: linear-gradient(135deg, #f0b8d8, #d4b0f0);
+      border-radius: 20px 20px 6px 20px;
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(200,140,210,0.3);
+    }
+
+    /* ── 타이핑 인디케이터 ── */
+    .typing-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      align-self: flex-start;
+    }
+
+    .typing-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffd6e7, #e8d0f8);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .typing-bubble {
+      background: rgba(255, 255, 255, 0.88);
+      border-radius: 20px 20px 20px 6px;
+      padding: 14px 18px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      box-shadow: 0 2px 12px rgba(180,140,210,0.15);
+      border: 1px solid rgba(220,200,240,0.4);
+    }
+
+    .typing-bubble span {
+      width: 7px;
+      height: 7px;
+      background: linear-gradient(135deg, #e090c0, #c090e0);
+      border-radius: 50%;
+      animation: typingDot 1.3s ease-in-out infinite;
+    }
+
+    .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingDot {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30%            { transform: translateY(-7px); opacity: 1; }
+    }
+
+    /* ── 입력창 ── */
+    .input-area {
+      padding: 14px 20px 18px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      background: rgba(255,255,255,0.5);
+      border-top: 1.5px solid rgba(220,200,240,0.4);
+      flex-shrink: 0;
+    }
+
+    .input-wrap {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1.5px solid rgba(220,185,240,0.6);
+      border-radius: 22px;
+      padding: 11px 18px;
+      display: flex;
+      align-items: flex-end;
+      box-shadow: 0 2px 10px rgba(200,150,220,0.12);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-wrap:focus-within {
+      border-color: #d090e0;
+      box-shadow: 0 2px 14px rgba(200,130,220,0.22);
+    }
+
+    .input-wrap textarea {
+      flex: 1;
+      border: none;
       outline: none;
-      max-height: 120px;
-      min-height: 46px;
-      line-height: 1.5;
-      color: #1a1a1a;
-      transition: border-color 0.2s;
+      background: transparent;
+      font-family: 'Nanum Round Square', sans-serif;
+      font-size: 14px;
+      color: #555;
+      resize: none;
+      max-height: 100px;
+      min-height: 22px;
+      line-height: 1.55;
     }
 
-    .input-area textarea:focus {
-      border-color: #1a1a1a;
-    }
-
-    .input-area textarea::placeholder {
-      color: #bbb;
+    .input-wrap textarea::placeholder {
+      color: #d0b0e0;
     }
 
     .send-btn {
       width: 46px;
       height: 46px;
-      background: #1a1a1a;
       border: none;
-      border-radius: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f0a0cc, #c090e8);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 3px 12px rgba(200,130,210,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
 
     .send-btn:hover {
-      background: #333;
+      transform: scale(1.07);
+      box-shadow: 0 4px 16px rgba(200,130,210,0.55);
     }
 
     .send-btn:active {
-      transform: scale(0.95);
+      transform: scale(0.94);
     }
 
     .send-btn:disabled {
-      background: #ccc;
+      background: linear-gradient(135deg, #e8d0e8, #d8c8e8);
+      box-shadow: none;
       cursor: not-allowed;
+      transform: none;
     }
 
     .send-btn svg {
       width: 18px;
       height: 18px;
       fill: #fff;
+      margin-left: 2px;
     }
 
-    .empty-state {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      color: #bbb;
+    /* 메시지 등장 애니메이션 */
+    .message, .typing-wrapper {
+      animation: msgIn 0.25s ease-out;
     }
 
-    .empty-state .icon {
-      font-size: 40px;
-    }
-
-    .empty-state p {
-      font-size: 14px;
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
   <div class="chat-container">
+
+    <!-- 헤더 -->
     <div class="chat-header">
-      <div class="avatar">✦</div>
-      <div>
-        <h1>Claude</h1>
-        <div class="status">AI 어시스턴트</div>
+      <!-- 귀여운 토끼 SVG 캐릭터 -->
+      <svg class="header-mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <!-- 귀 (왼쪽) -->
+        <ellipse cx="33" cy="22" rx="9" ry="18" fill="#f8d0e8"/>
+        <ellipse cx="33" cy="22" rx="5" ry="13" fill="#f5b0d8"/>
+        <!-- 귀 (오른쪽) -->
+        <ellipse cx="67" cy="22" rx="9" ry="18" fill="#f8d0e8"/>
+        <ellipse cx="67" cy="22" rx="5" ry="13" fill="#f5b0d8"/>
+        <!-- 머리 -->
+        <circle cx="50" cy="52" r="30" fill="#fff0f8"/>
+        <!-- 볼터치 -->
+        <ellipse cx="30" cy="60" rx="8" ry="5" fill="#ffc0d8" opacity="0.6"/>
+        <ellipse cx="70" cy="60" rx="8" ry="5" fill="#ffc0d8" opacity="0.6"/>
+        <!-- 눈 (왼쪽) -->
+        <circle cx="40" cy="50" r="5" fill="#4a3060"/>
+        <circle cx="42" cy="48" r="1.8" fill="#fff"/>
+        <!-- 눈 (오른쪽) -->
+        <circle cx="60" cy="50" r="5" fill="#4a3060"/>
+        <circle cx="62" cy="48" r="1.8" fill="#fff"/>
+        <!-- 코 -->
+        <ellipse cx="50" cy="60" rx="3.5" ry="2.5" fill="#f098b8"/>
+        <!-- 입 -->
+        <path d="M44 65 Q50 71 56 65" stroke="#f098b8" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- 수염 왼쪽 -->
+        <line x1="20" y1="60" x2="42" y2="62" stroke="#d8b0c8" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+        <line x1="20" y1="65" x2="42" y2="65" stroke="#d8b0c8" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+        <!-- 수염 오른쪽 -->
+        <line x1="80" y1="60" x2="58" y2="62" stroke="#d8b0c8" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+        <line x1="80" y1="65" x2="58" y2="65" stroke="#d8b0c8" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+        <!-- 몸통 -->
+        <ellipse cx="50" cy="88" rx="18" ry="12" fill="#f8d8ee"/>
+        <!-- 앞발 -->
+        <ellipse cx="36" cy="92" rx="7" ry="5" fill="#f8d8ee"/>
+        <ellipse cx="64" cy="92" rx="7" ry="5" fill="#f8d8ee"/>
+      </svg>
+
+      <div class="header-text">
+        <div class="header-title">세영이 Claude 🌸</div>
+        <div class="header-sub">항상 곁에 있을게요 ✨</div>
       </div>
     </div>
 
+    <!-- 메시지 목록 -->
     <div class="messages" id="messages">
       <div class="empty-state" id="emptyState">
-        <div class="icon">✦</div>
-        <p>무엇이든 물어보세요</p>
+        <svg class="empty-mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="33" cy="22" rx="9" ry="18" fill="#f8d0e8"/>
+          <ellipse cx="33" cy="22" rx="5" ry="13" fill="#f5b0d8"/>
+          <ellipse cx="67" cy="22" rx="9" ry="18" fill="#f8d0e8"/>
+          <ellipse cx="67" cy="22" rx="5" ry="13" fill="#f5b0d8"/>
+          <circle cx="50" cy="52" r="30" fill="#fff0f8"/>
+          <ellipse cx="30" cy="60" rx="8" ry="5" fill="#ffc0d8" opacity="0.6"/>
+          <ellipse cx="70" cy="60" rx="8" ry="5" fill="#ffc0d8" opacity="0.6"/>
+          <circle cx="40" cy="50" r="5" fill="#4a3060"/>
+          <circle cx="42" cy="48" r="1.8" fill="#fff"/>
+          <circle cx="60" cy="50" r="5" fill="#4a3060"/>
+          <circle cx="62" cy="48" r="1.8" fill="#fff"/>
+          <ellipse cx="50" cy="60" rx="3.5" ry="2.5" fill="#f098b8"/>
+          <path d="M44 65 Q50 71 56 65" stroke="#f098b8" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <ellipse cx="50" cy="88" rx="18" ry="12" fill="#f8d8ee"/>
+          <ellipse cx="36" cy="92" rx="7" ry="5" fill="#f8d8ee"/>
+          <ellipse cx="64" cy="92" rx="7" ry="5" fill="#f8d8ee"/>
+        </svg>
+        <p>안녕하세요! 세영이 Claude예요 🐰</p>
+        <span class="hint">무엇이든 물어봐요 ˙ᵕ˙</span>
       </div>
     </div>
 
+    <!-- 입력창 -->
     <div class="input-area">
-      <textarea
-        id="userInput"
-        placeholder="메시지를 입력하세요..."
-        rows="1"
-      ></textarea>
-      <button class="send-btn" id="sendBtn">
+      <div class="input-wrap">
+        <textarea
+          id="userInput"
+          placeholder="메시지를 입력해요 🌷"
+          rows="1"
+        ></textarea>
+      </div>
+      <button class="send-btn" id="sendBtn" title="전송">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
         </svg>
@@ -275,50 +478,65 @@
 
   <script>
     const messagesEl = document.getElementById('messages');
-    const inputEl = document.getElementById('userInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const emptyState = document.getElementById('emptyState');
+    const inputEl    = document.getElementById('userInput');
+    const sendBtn    = document.getElementById('sendBtn');
 
-    const history = [];
-    let isLoading = false;
+    const history  = [];
+    let isLoading  = false;
+
+    const MASCOT_SVG = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px">
+      <ellipse cx="33" cy="22" rx="9" ry="18" fill="#f8d0e8"/>
+      <ellipse cx="33" cy="22" rx="5" ry="13" fill="#f5b0d8"/>
+      <ellipse cx="67" cy="22" rx="9" ry="18" fill="#f8d0e8"/>
+      <ellipse cx="67" cy="22" rx="5" ry="13" fill="#f5b0d8"/>
+      <circle cx="50" cy="52" r="30" fill="#fff0f8"/>
+      <circle cx="40" cy="50" r="5" fill="#4a3060"/>
+      <circle cx="42" cy="48" r="1.8" fill="#fff"/>
+      <circle cx="60" cy="50" r="5" fill="#4a3060"/>
+      <circle cx="62" cy="48" r="1.8" fill="#fff"/>
+      <ellipse cx="50" cy="60" rx="3.5" ry="2.5" fill="#f098b8"/>
+      <path d="M44 65 Q50 71 56 65" stroke="#f098b8" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </svg>`;
+
+    function removeEmptyState() {
+      const el = document.getElementById('emptyState');
+      if (el) el.remove();
+    }
 
     function appendMessage(role, text) {
-      if (emptyState) emptyState.remove();
+      removeEmptyState();
 
       const wrapper = document.createElement('div');
       wrapper.className = `message ${role}`;
 
-      const icon = document.createElement('div');
-      icon.className = 'msg-icon';
-      icon.textContent = role === 'assistant' ? '✦' : '나';
+      const avatar = document.createElement('div');
+      avatar.className = 'msg-avatar';
+      if (role === 'assistant') {
+        avatar.innerHTML = MASCOT_SVG;
+      } else {
+        avatar.textContent = '나';
+      }
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
       bubble.textContent = text;
 
-      wrapper.appendChild(icon);
+      wrapper.appendChild(avatar);
       wrapper.appendChild(bubble);
       messagesEl.appendChild(wrapper);
       messagesEl.scrollTop = messagesEl.scrollHeight;
-      return wrapper;
     }
 
     function showTyping() {
-      if (emptyState) emptyState.remove();
+      removeEmptyState();
       const wrapper = document.createElement('div');
-      wrapper.className = 'message assistant';
+      wrapper.className = 'typing-wrapper';
       wrapper.id = 'typingIndicator';
-
-      const icon = document.createElement('div');
-      icon.className = 'msg-icon';
-      icon.textContent = '✦';
-
-      const indicator = document.createElement('div');
-      indicator.className = 'typing-indicator';
-      indicator.innerHTML = '<span></span><span></span><span></span>';
-
-      wrapper.appendChild(icon);
-      wrapper.appendChild(indicator);
+      wrapper.innerHTML = `
+        <div class="typing-avatar">${MASCOT_SVG}</div>
+        <div class="typing-bubble">
+          <span></span><span></span><span></span>
+        </div>`;
       messagesEl.appendChild(wrapper);
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
@@ -339,7 +557,6 @@
 
       appendMessage('user', text);
       history.push({ role: 'user', content: text });
-
       showTyping();
 
       try {
@@ -355,18 +572,18 @@
         if (!res.ok) {
           const errMsg = data.error || `HTTP ${res.status}`;
           console.error('[/chat 오류]', errMsg);
-          appendMessage('assistant', '오류가 발생했습니다: ' + errMsg);
+          appendMessage('assistant', '앗, 오류가 났어요 🥺 ' + errMsg);
         } else if (data.reply) {
           appendMessage('assistant', data.reply);
           history.push({ role: 'assistant', content: data.reply });
         } else {
           console.error('[/chat 오류] reply 필드 없음', data);
-          appendMessage('assistant', '오류가 발생했습니다: ' + (data.error || '알 수 없는 오류'));
+          appendMessage('assistant', '앗, 응답을 받지 못했어요 🥺');
         }
       } catch (err) {
         removeTyping();
         console.error('[fetch 오류]', err);
-        appendMessage('assistant', '서버에 연결할 수 없습니다.');
+        appendMessage('assistant', '서버에 연결할 수 없어요 🥺');
       }
 
       isLoading = false;
@@ -385,7 +602,7 @@
 
     inputEl.addEventListener('input', () => {
       inputEl.style.height = 'auto';
-      inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+      inputEl.style.height = Math.min(inputEl.scrollHeight, 100) + 'px';
     });
   </script>
 </body>
