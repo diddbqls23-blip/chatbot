@@ -20,13 +20,17 @@ app.post('/chat', async (req, res) => {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1024,
         messages,
       }),
     });
 
     const data = await response.json();
+    if (!response.ok) {
+      console.error('Anthropic API 에러 응답:', JSON.stringify(data));
+      return res.status(502).json({ error: data.error?.message || 'Anthropic API 오류' });
+    }
     const text = data.content?.find(b => b.type === 'text')?.text || '';
     res.json({ reply: text });
   } catch (err) {
