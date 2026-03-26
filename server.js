@@ -20,22 +20,24 @@ app.post('/chat', async (req, res) => {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-opus-4-6',
         max_tokens: 1024,
         messages,
       }),
     });
 
-    const data = await response.json();
     if (!response.ok) {
-      console.error('Anthropic API 에러 응답:', JSON.stringify(data));
-      return res.status(502).json({ error: data.error?.message || 'Anthropic API 오류' });
+      const err = await response.json();
+      console.error('API 오류:', err);
+      return res.status(502).json({ error: err.error?.message || 'API 오류' });
     }
+
+    const data = await response.json();
     const text = data.content?.find(b => b.type === 'text')?.text || '';
     res.json({ reply: text });
   } catch (err) {
-    console.error('Anthropic API 오류:', err.message);
-    res.status(500).json({ error: 'AI 응답 중 오류가 발생했어요' });
+    console.error('서버 오류:', err.message);
+    res.status(500).json({ error: '서버 오류가 발생했어요' });
   }
 });
 
